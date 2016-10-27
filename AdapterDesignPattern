@@ -1,0 +1,78 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+class PrintingPress
+{
+	public:
+		void typeSet()
+		{
+			cout << "Setting the type" << endl;
+		}
+};
+// Let pretend my program begins here. Everything above thi, we pretend
+// is from a .dll library that i bought or borrowed.
+class TypeWriter
+{
+	public:
+		virtual void type() = 0;
+};
+class Laptop : public TypeWriter
+{
+	public:
+		void type()
+		{
+			cout << "Typing on my Laptop" << endl;
+		}
+};
+class Corona : public TypeWriter
+{
+	public:
+		void type()
+		{
+			cout << "Typing on my Smith-Corona" << endl;
+		}
+};
+// Adapter DesignPattern
+// Uses an exsiting class, unmodified, and encapsulates in another class that
+// adapts to the polymorphic required profile.
+class PrintingPressAdapter : public TypeWriter
+{
+	private:
+		PrintingPress* pp;
+	public:
+		PrintingPressAdapter(PrintingPress* p)
+		{
+			pp = p;
+		}
+		void type()
+		{
+			pp->typeSet();
+		}
+};
+class Typist
+{
+	private:
+		TypeWriter* tw;
+	public:
+		Typist(TypeWriter* t)
+		{
+			tw = t;
+		}
+		void work()
+		{
+			tw->type();
+		}
+};
+// Adapter does not aggergate polymorphically
+// Both client class and adapter class aggergate
+int main()
+{
+	//Typist* tom = new Typist(new Corona);
+	Typist* tom2 = new Typist(new PrintingPressAdapter(new PrintingPress()));
+	//tom->work();
+	tom2->work();
+
+	return 0;
+}
