@@ -1,0 +1,51 @@
+#!/bin/bash
+RED='\033[1;31m'
+GRN='\033[1;32m'
+YEL='\033[1;33m'
+NC='\033[0m'
+
+if grep -n '.\{81,\}' *.c *.java; then
+	echo -e ${RED}"There are lines over 80 chars in your code! See above."${NC}
+fi
+if grep -n 'printf\|out\.print\|err\.print' *.c *.java; then
+	echo -e ${RED}"You are only allowed to make calls to fputc! See above."${NC}
+fi
+if make new 2>&1 | grep 'error\|warning'; then
+	echo -e ${RED}"Compilation Failed! See above."${NC}
+	exit 1
+else
+	echo -e ${GRN}"Compilation Passed!"${NC}
+fi
+
+$HOME/../public/hw1/driver1 &> hw1_c.out
+$HOME/../public/hw1/driver2 &> hw1_java.out
+
+./driver1 &> hw1_c.mine
+./driver2 &> hw1_java.mine
+
+diff -a hw1_java.out hw1_java.mine
+diffs="$(diff hw1_java.mine hw1_java.out | wc -l)"
+if [[ diffs -ne 0 ]]; then
+	echo -e ${RED}"hw1.java has incorrect output! See above."${NC}
+	rm hw1_java.out
+	rm hw1_java.mine
+	exit 1
+else	
+	echo -e ${GRN}"hw1.java has correct output!"${NC}
+fi
+
+diff -a hw1_c.out hw1_c.mine
+diffs="$(diff hw1_c.mine hw1_c.out | wc -l)"
+if [[ diffs -ne 0 ]]; then
+	echo -e ${RED}"hw1.c has incorrect output! See above."${NC}
+	rm hw1_c.out
+	rm hw1_c.mine
+	exit 1
+else	
+	echo -e ${GRN}"hw1.c has correct output!"${NC}
+fi
+
+rm hw1_c.out
+rm hw1_c.mine
+rm hw1_java.out
+rm hw1_java.mine
